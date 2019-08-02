@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+                  xmlns:android="http://schemas.android.com/apk/res/android">
+  <EditTextPreference
+    app:dialogTitle="@string/octoprintHost"
+    app:dialogMessage="schema://host:port"
+    app:defaultValue=""
+    app:key="pref_octoprintHost"
+    app:persistent="true"
+    app:title="@string/octoprintHost"
+    app:inputType="textUri" />
+  <Preference
+    app:title="@string/authenticate"
+    app:key="pref_authenticateButton">
+    <intent
+      android:targetPackage="ca.lfcode.OctoBot"
+      android:targetClass="ca.lfcode.OctoBot.AuthenticateActivity" />
+  </Preference>
+</PreferenceScreen>
+
