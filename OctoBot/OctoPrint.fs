@@ -1,74 +1,77 @@
 ﻿module OctoPrint
-open System.Net.Http
-open System.Runtime.Serialization.Json
 open System.Text
+open FSharp.Data
+open Newtonsoft.Json
 
-let _client = new HttpClient ()
 let mutable octoUri = ""
-
-let _request msg =
-    async {
-        return! _client.SendAsync msg
-                |> Async.AwaitTask
-    } |> Async.RunSynchronously
 
 let makeOctoUri sub =
     let builder = System.UriBuilder octoUri
     builder.Path <- sub
-    builder.Uri
+    builder.Uri.AbsoluteUri
 
-let _octoRequest method data sub =
-    let msg = new HttpRequestMessage ()
-    msg.RequestUri <- makeOctoUri sub
-    msg.Method <- method
-    data |> Option.map (fun d -> (msg.Content <- d)) |> ignore
-    _request msg
+let _octoRequest method data path =
+    Http.Request (
+        url = (makeOctoUri path),
+        ?body = data,
+        headers = [ ("Accept", "application/json"); ("Content-Type", HttpContentTypes.Json) ],
+        httpMethod = method
+        )
 
 let octoGet = _octoRequest HttpMethod.Get None
-let octoPost data = _octoRequest HttpMethod.Post (Some(data))
-let octoPut = _octoRequest HttpMethod.Put None
-
-
-let serialize (serializer: DataContractJsonSerializer) obj =
-    let stream = new System.IO.MemoryStream ()
-    serializer.WriteObject(stream, obj)
-    System.Text.Encoding.UTF8.GetString(stream.ToArray())
-
-let unserialize (serializer: DataContractJsonSerializer) (str: string) =
-    let stream = new System.IO.MemoryStream (Encoding.UTF8.GetBytes (str))
-    serializer.ReadObject stream
+let octoPost req = _octoRequest HttpMethod.Post (Some req)
 
 let getWorkflowSupported () =
     let res = octoGet "/plugin/appkeys/probe"
     (int res.StatusCode) = 204
 
-type KeyRequest = {
-    app: string
-    user: string
-}
+type KeyRequest = { app: string; user: string }
 
-let keyRequestSerializer = serialize (DataContractJsonSerializer typeof<KeyRequest>)
+type KeyRequestResp = JsonProvider<"""{ "app_token": "abcdef" }""">
 
+/// <summary>Start authorization process</summary>
+/// <param name="appName">Human readable identifier to use for the application requesting access</param>
+/// <param name="userId">Username of the OctoPrint user this request is for</param>
+/// <returns>AppToken to use in pollDecision</returns>
+/// <seealso cref="pollDecision" />
 let keyRequest appName userId =
-    let req = new StringContent (keyRequestSerializer {app=appName; user=userId})
-    octoPost req "/plugin/appkeys/request"
+    let req = JsonConvert.SerializeObject {app=appName; user=userId}
+    let resp = octoPost (TextRequest req) "/plugin/appkeys/request"
+    match resp.Body with
+    | Text(t) -> Some (KeyRequestResp.Parse t).AppToken
+    | Binary(_) -> None
 
-type AppKeyGrantedResp = {
-    api_key: string
-}
-let appKeyUnserialize = unserialize (DataContractJsonSerializer typeof<AppKeyGrantedResp>)
-
+type AppKeyGrantedResp = JsonProvider<"""{ "api_key": "apikey" }""">
 
 type AppKeyDecision =
-    | Granted of string
-    | PollAgain
-    | Failed
+| Granted of string
+| PollAgain
+| Failed
 
-let pollDecision userId =
-    let res = octoGet (sprintf "/plugin/appkeys/request/%s" userId)
+/// <summary>Check if authorization has completed yet. Call every <5 seconds.</summary>
+/// <param name="appToken">AppToken from <see cref="keyRequest">keyRequest</see></param>
+let pollDecision appToken =
+    let res = octoGet (sprintf "/plugin/appkeys/request/%s" appToken)
     match int res.StatusCode with
     | 200 ->
-        let appkey = appKeyUnserialize (res.Content.ToString()) :?> AppKeyGrantedResp
-        Granted(appkey.api_key)
+        match res.Body with
+        | Text(t) ->
+            let appkey = AppKeyGrantedResp.Parse t
+            Granted(appkey.ApiKey)
+        | Binary(_) -> Failed
     | 202 -> PollAgain
     | _ -> Failed
+
+
+let rec waitForDecision appToken pollInterval =
+    let pollInt = defaultArg pollInterval 2
+    match pollDecision appToken with
+    | PollAgain ->
+        System.Threading.Thread.Sleep pollInt
+        waitForDecision appToken pollInterval
+    | Granted(s) -> Some s
+    | Failed -> None
+
+
+let testReqProcess () =
+    keyRequest "app" "lf" |> Option.map waitForDecision
