@@ -22,6 +22,12 @@ type SettingsFragment () =
   override this.OnCreate (savedInstanceState) =
     base.OnCreate (savedInstanceState)
     base.AddPreferencesFromResource(R.Xml.preferences)
-    //let pref = base.FindPreference("pref_octoprintHost")
+    let clearAuth = this.FindPreference ("pref_clearAuth")
+    clearAuth.PreferenceClick.Add (fun arg ->
+        let editHandle = this.PreferenceManager.SharedPreferences.Edit ()
+        (editHandle.Remove ("pref_apiKey")).Commit() |> ignore
+        ()
+        )
+    ()
     
 

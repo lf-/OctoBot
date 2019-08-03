@@ -11,13 +11,14 @@ open Android.OS
 open Android.Runtime
 open Android.Views
 open Android.Widget
+open Android.Support.V7.App
 
-[<Activity (Label = "AuthenticateActivity")>]
+[<Activity (Label = "AuthenticateActivity", Name = "ca.lfcode.OctoBot.AuthenticateActivity")>]
 type AuthenticateActivity () =
-  inherit Activity()
+  inherit AppCompatActivity()
 
   override this.OnCreate(bundle) =
     base.OnCreate (bundle)
-    // Create your application here
+    this.SetContentView (R.Layout.Authenticate)
 
 
