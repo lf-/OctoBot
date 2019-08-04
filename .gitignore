@@ -455,3 +455,4 @@ healthchecksdb
 MigrationBackup/
 
 # End of https://www.gitignore.io/api/fsharp,android,visualstudio,xamarinstudio
+*.designer.cs
