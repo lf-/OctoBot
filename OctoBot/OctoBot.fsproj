@@ -65,9 +65,6 @@
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
     <AndroidResource Include="Resources\layout\Main.axml" />
-    <AndroidResource Include="Resources\layout\Settings.axml">
-      <SubType>Designer</SubType>
-    </AndroidResource>
     <AndroidResource Include="Resources\layout\Authenticate.axml">
       <SubType>Designer</SubType>
     </AndroidResource>
@@ -86,14 +83,9 @@
     <AndroidAsset Include="Assets\AboutAssets.txt" />
     <None Include="GettingStarted.Xamarin" />
     <Content Include="packages.config" />
-    <Compile Include="OctoPrint.fs" />
     <Compile Include="Util.fs" />
-    <Compile Include="SettingsFragment.fs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="SettingsActivity.fs">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="OctoPrint.fs" />
+    <Compile Include="AndroidUtil.fs" />
     <Compile Include="AuthenticateActivity.fs">
       <SubType>Code</SubType>
     </Compile>

@@ -26,8 +26,6 @@ type MainActivity () =
     override this.OnOptionsItemSelected (item) =
         match item.ItemId with
         | R.Id.action_settings ->
-            let act = typeof<SettingsActivity>
-            this.StartActivity(act)
             ()
         | _ -> ()
         true

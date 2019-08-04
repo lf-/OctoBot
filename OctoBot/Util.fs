@@ -1,2 +1,3 @@
-﻿namespace OctoBot
-type R = OctoBot.Resource
+﻿module Util
+let (|>>) xA x2y = async.Bind (xA, x2y)
+

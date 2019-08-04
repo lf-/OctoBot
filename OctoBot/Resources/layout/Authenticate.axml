@@ -16,10 +16,23 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
     <android.support.design.widget.TextInputEditText 
+        android:id="@+id/octoprintUsernameEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/octoprintUsername"
         android:inputType="textVisiblePassword|textNoSuggestions" />
+  </android.support.design.widget.TextInputLayout>
+  <android.support.design.widget.TextInputLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/inputLayoutOctoprintHost"
+    app:errorEnabled="true">
+    <android.support.design.widget.TextInputEditText 
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/editTextOctoprintHost"
+        android:hint="@string/octoprintHost"
+        android:inputType="textUri" />
   </android.support.design.widget.TextInputLayout>
   <Button
     android:text="@string/beginAuth"
@@ -27,4 +40,17 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_gravity="bottom|right" />
+   <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        android:id="@+id/allowView">
+        <ProgressBar
+            android:id="@+id/allowSpinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <TextView
+            android:text="@string/pleaseAllowOnWeb"
+            android:layout_toRightOf="@id/allowSpinner" />
+   </RelativeLayout>
 </LinearLayout>

@@ -2,10 +2,11 @@
 <resources>
   <string name="hello">Hello World, Click Me!</string>
   <string name="app_name">OctoBot</string>
-  <string name="octoprintHost">OctoPrint Host</string>
+  <string name="octoprintHost">OctoPrint Base URI</string>
   <string name="action_settings">Settings</string>
   <string name="clearAuth">Clear OctoPrint authentication details</string>
   <string name="octoprintUsername">OctoPrint Username</string>
   <string name="beginAuth">Authenticate</string>
+  <string name="pleaseAllowOnWeb">Please sign in to your OctoPrint instance on a browser and accept the permission dialog</string>
 
 </resources>
